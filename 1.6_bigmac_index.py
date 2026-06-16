@@ -1,12 +1,22 @@
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 import pandas as pd
+import platform
 
-# 1. 한글 폰트 설정
-font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
-plt.rc('font', family='NanumGothic')
+# ==========================================
+# 1. 기본 설정
+# ==========================================
+# matplotlib 한글 폰트 설정
+if platform.system() == 'Windows':
+    plt.rc('font', family='Malgun Gothic')
+elif platform.system() == 'Darwin':
+    plt.rc('font', family='AppleGothic')
+else:
+    plt.rc('font', family='NanumGothic')
+plt.rcParams['axes.unicode_minus'] = False
 
+# ==========================================
 # 2. 데이터 준비
+# ==========================================
 data = {
     'Year': [2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
              2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
@@ -19,7 +29,9 @@ data = {
 }
 df = pd.DataFrame(data)
 
-# 3. 값 계산
+# ==========================================
+# 3. 지표 계산
+# ==========================================
 df['BigMac_KRW'] = df['ExchangeRate'] * df['BigMac_USD']
 balance = [1000000]
 for rate in df['InterestRate']:
@@ -27,38 +39,46 @@ for rate in df['InterestRate']:
 df['Investment_Value'] = balance[1:]
 df['BigMac_Count'] = df['Investment_Value'] / df['BigMac_KRW']
 
-# 4. 정규화 (Min-Max Scaling and Ratio-based Scaling)
+# ==========================================
+# 4. 정규화 처리 (Normalization)
+# ==========================================
 def min_max_scaler(series):
     return (series - series.min()) / (series.max() - series.min())
 
-# Calculate growth ratios for Investment_Value and BigMac_KRW
+# Investment_Value와 BigMac_KRW의 성장 비율 계산
 initial_investment = df['Investment_Value'].iloc[0]
 initial_bigmac_krw = df['BigMac_KRW'].iloc[0]
 
 investment_growth_ratio = df['Investment_Value'] / initial_investment
 bigmac_krw_growth_ratio = df['BigMac_KRW'] / initial_bigmac_krw
 
-# Determine a common scaling factor based on the maximum growth ratio
-# This makes both series start at 0 and the highest growth series end at 1
+# 공통 스케일링 팩터 결정
 max_growth_ratio = max(investment_growth_ratio.max(), bigmac_krw_growth_ratio.max())
 
 df['Norm_Invest'] = (investment_growth_ratio - 1) / (max_growth_ratio - 1)
 df['Norm_Price'] = (bigmac_krw_growth_ratio - 1) / (max_growth_ratio - 1)
 
-# Keep BigMac_Count normalization as original min-max scaling
+# BigMac_Count는 원래의 min-max 스케일링 유지
 df['Norm_Count'] = min_max_scaler(df['BigMac_Count'])
 
-# 5. 그래프 그리기
-plt.figure(figsize=(14, 9))
-ms = 12
+# ==========================================
+# 5. 그래프 시각화
+# ==========================================
+import os
+os.makedirs('plots', exist_ok=True)
+
+plt.figure(figsize=(10, 7))
+ms = 10
 
 plt.plot(df['Year'], df['Norm_Invest'], marker='s', markersize=ms, label='예금 자산 (원)', color='blue')
 plt.plot(df['Year'], df['Norm_Price'], marker='o', markersize=ms, label='빅맥 가격 (원)', color='red')
 plt.plot(df['Year'], df['Norm_Count'], marker='^', markersize=ms, label='구매 가능 개수', color='green')
 
-plt.xticks(range(2006, 2027, 1), fontsize=14)
-plt.xlabel('연도', fontsize = 18)
-plt.yticks([])
+plt.xticks(range(2006, 2027, 2), fontsize=12)
+plt.yticks([], fontsize=12)
+plt.xlabel('연도', fontsize=16, labelpad=15)
+plt.ylabel('정규화된 지수', fontsize=16, labelpad=15)
+plt.title('빅맥 지수 및 예금 자산 추이', fontsize=20, pad=20)
 
 # 상하 여백 설정
 plt.ylim(-0.1, 1.1)
@@ -69,7 +89,7 @@ for i in range(len(df)):
     plt.annotate(f"{df['Investment_Value'][i]/10000:.0f}만", (df['Year'][i], df['Norm_Invest'][i]),
                  textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='blue')
 
-    # Conditionally adjust xytext for BigMac_KRW for specific years
+    # 특정 연도에 대한 BigMac_KRW 위치 조정
     if df['Year'][i] in [2008, 2009, 2011, 2015, 2021, 2024]:
         plt.annotate(f"{df['BigMac_KRW'][i]:.0f}", (df['Year'][i], df['Norm_Price'][i]),
                      textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='red')
@@ -77,7 +97,7 @@ for i in range(len(df)):
         plt.annotate(f"{df['BigMac_KRW'][i]:.0f}", (df['Year'][i], df['Norm_Price'][i]),
                      textcoords="offset points", xytext=(0,-20), ha='center', fontsize=anno_font_size, color='red')
 
-    # Conditionally adjust xytext for BigMac_Count for specific years
+    # 특정 연도에 대한 BigMac_Count 위치 조정
     if df['Year'][i] in [2008, 2015, 2018, 2019, 2021, 2022, 2024]:
         plt.annotate(f"{df['BigMac_Count'][i]:.0f}", (df['Year'][i], df['Norm_Count'][i]),
                      textcoords="offset points", xytext=(0,-20), ha='center', fontsize=anno_font_size, color='green')
@@ -86,11 +106,11 @@ for i in range(len(df)):
                      textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='green')
 
 # 범례 상단 중앙 배치
-plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.), ncol=3, fontsize=16, frameon=True)
+plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.), ncol=3, fontsize=12, frameon=True)
 
 plt.grid(True, axis='x', linestyle='--')
 plt.tight_layout()
 
-plt.savefig("bigmac_index.png", dpi=300, bbox_inches="tight")
+plt.savefig("plots/1.6_bigmac_index.png", dpi=300, bbox_inches="tight")
 
 plt.show()

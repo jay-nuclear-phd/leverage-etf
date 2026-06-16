@@ -1,11 +1,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import platform
 
-# =========================
+# ==========================================
 # 1. 기본 설정
-# =========================
-font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
-plt.rc('font', family='NanumGothic')
+# ==========================================
+# matplotlib 한글 폰트 설정
+if platform.system() == 'Windows':
+    plt.rc('font', family='Malgun Gothic')
+elif platform.system() == 'Darwin':
+    plt.rc('font', family='AppleGothic')
+else:
+    plt.rc('font', family='NanumGothic')
 plt.rcParams['axes.unicode_minus'] = False
 
 annual_contribution = 10_000_000.0  # 매년 투자금: 1,000만 원
@@ -14,9 +20,9 @@ tax_free_amount = 2_500_000.0       # 연간 기본공제 250만 원
 tax_rate = 0.22                     # 양도세 22%
 max_years = 50
 
-# =========================
+# ==========================================
 # 2. 전략 1: 매년 말 매도 후 재매수
-# =========================
+# ==========================================
 annual_sell_results = []
 
 portfolio_value = 0.0
@@ -46,9 +52,9 @@ for year in range(1, max_years + 1):
         "매년 매도 전략_세후 최종금액": portfolio_value,
     })
 
-# =========================
+# ==========================================
 # 3. 전략 2: 계속 보유 후 마지막에만 매도
-# =========================
+# ==========================================
 results = []
 
 for target_year in range(1, max_years + 1):
@@ -86,9 +92,9 @@ for target_year in range(1, max_years + 1):
         "계속 보유 - 매년 매도 차이": hold_after_tax_value - annual_sell_row["매년 매도 전략_세후 최종금액"],
     })
 
-# =========================
+# ==========================================
 # 4. 결과표 생성
-# =========================
+# ==========================================
 result_df = pd.DataFrame(results)
 
 # float 그대로 유지
@@ -103,11 +109,13 @@ money_cols = [
     "계속 보유 - 매년 매도 차이",
 ]
 
-# =========================
-# 8. 그래프 그리기
-# =========================
+# ==========================================
+# 5. 그래프 시각화
+# ==========================================
+import os
+os.makedirs('plots', exist_ok=True)
 
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(10, 7))
 
 # 원 그래프 데이터
 x = result_df["연도"]
@@ -131,18 +139,19 @@ ax.plot(
     label="계속 보유 후 최종 매도"
 )
 
-ax.set_title("매년 매도 전략 vs 계속 보유 전략 세후 최종금액", fontsize=15)
-ax.set_xlabel("투자 기간 (년)", fontsize=12)
-ax.set_ylabel("세후 최종금액 (억 원)", fontsize=12)
+ax.set_title("매년 매도 전략 vs 계속 보유 전략 세후 최종금액", fontsize=20, pad=20)
+ax.set_xlabel("투자 기간 (년)", fontsize=16, labelpad=15)
+ax.set_ylabel("세후 최종금액 (억 원)", fontsize=16, labelpad=15)
 
 ax.grid(True, linestyle="--", alpha=0.4)
+ax.tick_params(axis='both', which='major', labelsize=12)
 
 # 범례 오른쪽 아래
-ax.legend(loc="lower right", fontsize=10)
+ax.legend(loc="lower right", fontsize=12)
 
-# =========================
-# 9. 작은 그래프: 최초 10년 차이
-# =========================
+# ==========================================
+# 6. 보조 그래프: 최초 10년 차이
+# ==========================================
 inset_ax = ax.inset_axes([0.07, 0.50, 0.48, 0.42])
 
 zoom_df = result_df[result_df["연도"] <= 10].copy()
@@ -172,19 +181,19 @@ inset_ax.axhline(
     alpha=0.7
 )
 
-inset_ax.set_title("최초 10년 차이", fontsize=11)
+inset_ax.set_title("최초 10년 차이", fontsize=12)
 inset_ax.set_xlim(1, 10)
 inset_ax.set_xticks(range(1, 11, 1))
-inset_ax.set_xlabel("투자 기간 (년)", fontsize=9)
-inset_ax.set_ylabel("차이 (만 원)", fontsize=9)
+inset_ax.set_xlabel("투자 기간 (년)", fontsize=12)
+inset_ax.set_ylabel("차이 (만 원)", fontsize=12)
 
 inset_ax.grid(True, linestyle="--", alpha=0.35)
-inset_ax.tick_params(axis="both", labelsize=8)
+inset_ax.tick_params(axis="both", labelsize=12)
 
 plt.tight_layout()
 
 plt.savefig(
-    "qld_tax_simulation_30years.png",
+    "plots/7.2_qld_tax_simulation_30years.png",
     dpi=300,
     bbox_inches="tight"
 )

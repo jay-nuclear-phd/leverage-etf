@@ -1,14 +1,23 @@
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 import pandas as pd
 import numpy as np
+import platform
 
-# 1. 한글 폰트 설치 및 설정
-font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
-plt.rc('font', family='NanumGothic')
+# ==========================================
+# 1. 기본 설정
+# ==========================================
+# matplotlib 한글 폰트 설정
+if platform.system() == 'Windows':
+    plt.rc('font', family='Malgun Gothic')
+elif platform.system() == 'Darwin':
+    plt.rc('font', family='AppleGothic')
+else:
+    plt.rc('font', family='NanumGothic')
 plt.rcParams['axes.unicode_minus'] = False
 
+# ==========================================
 # 2. 설정 정보
+# ==========================================
 file_path = 'WID_Data.xlsx'
 # 시트명과 그래프 제목 매핑
 sheet_info = {
@@ -18,7 +27,12 @@ sheet_info = {
     'WealthTop1': '주요국 자산 상위 1% 점유율 추이 (1980-2024)'
 }
 
-# 3. 반복문을 통해 시트별 그래프 생성
+# ==========================================
+# 3. 데이터 처리 및 시각화
+# ==========================================
+import os
+os.makedirs('plots', exist_ok=True)
+
 for sheet_name, title in sheet_info.items():
     # 데이터 불러오기
     df = pd.read_excel(file_path, sheet_name=sheet_name)
@@ -58,8 +72,9 @@ for sheet_name, title in sheet_info.items():
 
     # 축 및 레이블 설정
     plt.xticks(range(1980, 2026, 5), fontsize=12)
+    plt.yticks(fontsize=12)
     plt.xlabel('연도', fontsize=16, labelpad=15)
-    plt.ylabel('', fontsize=0) # Y축 레이블 제거
+    plt.ylabel('점유율', fontsize=16, labelpad=15)
     plt.title(title, fontsize=20, pad=20)
 
     # 범례 설정 (그래프 내부 왼쪽 상단)
@@ -68,5 +83,6 @@ for sheet_name, title in sheet_info.items():
     plt.grid(True, axis='both', linestyle='--', alpha=0.5)
     plt.tight_layout()
 
-    # 그래프 출력
+    # 그래프 저장 및 출력
+    plt.savefig('plots/2.3.1_wid_inequality_trends.png', dpi=300, bbox_inches="tight")
     plt.show()

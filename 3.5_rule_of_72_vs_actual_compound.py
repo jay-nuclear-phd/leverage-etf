@@ -1,55 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
-from pathlib import Path
+import platform
 
+# ==========================================
+# 1. 기본 설정
+# ==========================================
+# matplotlib 한글 폰트 설정
+if platform.system() == 'Windows':
+    plt.rc('font', family='Malgun Gothic')
+elif platform.system() == 'Darwin':
+    plt.rc('font', family='AppleGothic')
+else:
+    plt.rc('font', family='NanumGothic')
+plt.rcParams['axes.unicode_minus'] = False
 
-# =========================
-# 1. 한글 폰트 설정
-# =========================
-def set_korean_font():
-    font_candidates = [
-        # Linux / WSL
-        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
-        "/usr/share/fonts/truetype/nanum/NanumBarunGothic.ttf",
-        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-        "/usr/share/fonts/opentype/noto/NotoSansCJKkr-Regular.otf",
-
-        # Windows
-        "C:/Windows/Fonts/malgun.ttf",
-
-        # macOS
-        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-        "/System/Library/Fonts/AppleGothic.ttf",
-    ]
-
-    for font_path in font_candidates:
-        if Path(font_path).exists():
-            fm.fontManager.addfont(font_path)
-            font_name = fm.FontProperties(fname=font_path).get_name()
-            plt.rcParams["font.family"] = font_name
-            plt.rcParams["axes.unicode_minus"] = False
-            print(f"사용 폰트: {font_name}")
-            return
-
-    print("한글 폰트를 찾지 못했습니다.")
-    print("WSL/Linux라면 아래 명령어로 폰트를 설치하세요:")
-    print("sudo apt update && sudo apt install -y fonts-nanum")
-
-
-set_korean_font()
-
-
-# =========================
+# ==========================================
 # 2. 데이터 생성
-# =========================
+# ==========================================
 # 연수익률 1% ~ 20%
 rates_percent = np.linspace(1, 20, 300)
 rates_decimal = rates_percent / 100
 
 # 실제 복리 공식으로 계산한 2배 달성 기간
-# 2 = (1 + r)^t
-# t = log(2) / log(1 + r)
+# 2 = (1 + r)^t -> t = log(2) / log(1 + r)
 actual_years = np.log(2) / np.log(1 + rates_decimal)
 
 # 72의 법칙으로 계산한 근사 기간
@@ -66,10 +39,9 @@ highlight_actual_years = np.log(2) / np.log(1 + highlight_decimal)
 highlight_rule72_years = 72 / highlight_rates
 highlight_products = highlight_rates * highlight_actual_years
 
-
-# =========================
-# 3. 그래프 그리기
-# =========================
+# ==========================================
+# 3. 그래프 시각화
+# ==========================================
 fig, axes = plt.subplots(
     nrows=2,
     ncols=1,
@@ -77,10 +49,8 @@ fig, axes = plt.subplots(
     sharex=True
 )
 
-
 # -------------------------
-# 첫 번째 그래프
-# 실제 복리 계산 vs 72의 법칙
+# 첫 번째 그래프: 실제 복리 vs 72의 법칙
 # -------------------------
 axes[0].plot(
     rates_percent,
@@ -118,10 +88,8 @@ axes[0].grid(True, alpha=0.3)
 axes[0].legend(fontsize=11)
 axes[0].set_ylim(0, 75)
 
-
 # -------------------------
-# 두 번째 그래프
-# 실제 계산에서 연수익률 × 기간이 얼마인지
+# 두 번째 그래프: 연수익률 × 기간 분석
 # -------------------------
 axes[1].plot(
     rates_percent,
@@ -171,13 +139,11 @@ axes[1].set_ylabel("연수익률 × 기간", fontsize=12)
 axes[1].grid(True, alpha=0.3)
 axes[1].legend(fontsize=11)
 
-
-# =========================
-# 4. 전체 설정
-# =========================
+# ==========================================
+# 4. 전체 설정 및 마무리
+# ==========================================
 axes[1].set_xlim(0, 20)
 axes[1].set_xticks(np.arange(0, 21, 2))
-
 
 fig.text(
     0.5,
@@ -189,7 +155,7 @@ fig.text(
 
 plt.tight_layout(rect=[0, 0.04, 1, 0.95])
 
-# 책 삽입용 고해상도 저장
+# 고해상도 저장
 plt.savefig("rule_of_72_vs_actual_compound.png", dpi=300, bbox_inches="tight")
 
-# plt.show()
+plt.show()

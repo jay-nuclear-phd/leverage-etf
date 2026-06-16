@@ -5,19 +5,21 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import platform
 
-system = platform.system()
-
-if system == "Windows":
-    plt.rcParams["font.family"] = "Malgun Gothic"
-elif system == "Linux":
-    plt.rcParams["font.family"] = "NanumGothic"
-elif system == "Darwin":  # macOS
-    plt.rcParams["font.family"] = "AppleGothic"
+# ==========================================
+# 1. 기본 설정
+# ==========================================
+# matplotlib 한글 폰트 설정
+if platform.system() == 'Windows':
+    plt.rc('font', family='Malgun Gothic')
+elif platform.system() == 'Darwin':
+    plt.rc('font', family='AppleGothic')
 else:
-    plt.rcParams["font.family"] = "sans-serif"
+    plt.rc('font', family='NanumGothic')
+plt.rcParams['axes.unicode_minus'] = False
 
-plt.rcParams["axes.unicode_minus"] = False
-
+# ==========================================
+# 2. 데이터 불러오기 및 전처리
+# ==========================================
 df = pd.read_excel("NASDAQCOM.xlsx", sheet_name="Daily, Close")
 df["observation_date"] = pd.to_datetime(df["observation_date"])
 df = df.sort_values("observation_date").reset_index(drop=True)
@@ -45,6 +47,9 @@ def get_daily_expense(lev):
 
 leverage_expenses = np.array([get_daily_expense(lev) for lev in leverages])
 
+# ==========================================
+# 3. 몬테카를로 시뮬레이션 실행
+# ==========================================
 simulation_results = []
 
 for k in tqdm(range(1000), desc="시뮬레이션 진행 중"):
@@ -81,12 +86,9 @@ cagr_summary = (
     .reset_index()
 )
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-# =========================
-# 그래프용 데이터 준비
-# =========================
+# ==========================================
+# 4. 결과 분석 및 시각화 준비
+# ==========================================
 plot_df = cagr_summary.copy()
 
 plot_df["mean_pct"] = plot_df["mean_cagr"] * 100
@@ -110,10 +112,13 @@ best_lower_y = plot_df.loc[best_lower_idx, "mean_pct"]
 best_lower_bound = plot_df.loc[best_lower_idx, "lower_bound"]
 
 
-# =========================
-# 그래프 그리기
-# =========================
-plt.figure(figsize=(10, 6))
+# ==========================================
+# 5. 그래프 시각화
+# ==========================================
+import os
+os.makedirs('plots', exist_ok=True)
+
+plt.figure(figsize=(10, 7))
 
 # 에러바 영역을 연한 음영으로 표시
 plt.fill_between(
@@ -155,7 +160,7 @@ plt.annotate(
     f"평균 최고점\n{max_return_x:.1f}배, {max_return_y:.1f}%",
     xy=(max_return_x, max_return_y),
     xytext=(max_return_x - 0.45, max_return_y + 1.1),
-    fontsize=10.5,
+    fontsize=12,
     arrowprops=dict(
         arrowstyle="->",
         linewidth=1.2,
@@ -197,7 +202,7 @@ plt.annotate(
     f"하단 기준 최고점\n{best_lower_x:.1f}배\n하단 {best_lower_bound:.1f}%",
     xy=(best_lower_x, best_lower_bound),
     xytext=(best_lower_x + 0.18, best_lower_bound - 1.7),
-    fontsize=10.5,
+    fontsize=12,
     arrowprops=dict(
         arrowstyle="->",
         linewidth=1.2,
@@ -217,21 +222,22 @@ base_return = plot_df.loc[plot_df["leverage"] == 1.0, "mean_pct"].iloc[0]
 # 그래프 설정
 plt.grid(True, linestyle="--", alpha=0.35)
 
-plt.xlabel("레버리지 배율", fontsize=12)
-plt.ylabel("평균 연복리 수익률 (%)", fontsize=12)
+plt.xlabel("레버리지 배율", fontsize=16, labelpad=15)
+plt.ylabel("평균 연복리 수익률 (%)", fontsize=16, labelpad=15)
 
 plt.title(
     "레버리지 배율별 평균 연복리 수익률과 변동성",
-    fontsize=15,
-    pad=14
+    fontsize=20,
+    pad=20
 )
 
-plt.xticks(np.arange(1.0, 3.0 + 0.1, 0.1), rotation=45)
+plt.xticks(np.arange(1.0, 3.0 + 0.1, 0.1), rotation=45, fontsize=12)
+plt.yticks(fontsize=12)
 
-plt.legend(fontsize=10, loc="upper left")
+plt.legend(fontsize=12, loc="upper left")
 
 plt.tight_layout()
 
-plt.savefig("leverage_cagr_errorbar.png", dpi=300, bbox_inches="tight")
+plt.savefig("plots/5.3.1_leverage_cagr_errorbar.png", dpi=300, bbox_inches="tight")
 
 plt.show()
