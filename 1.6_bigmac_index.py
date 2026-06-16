@@ -112,5 +112,5 @@ plt.grid(True, axis='x', linestyle='--')
 plt.tight_layout()
 
 plt.savefig("plots/1.6_bigmac_index.png", dpi=300, bbox_inches="tight")
- 
+
 plt.show()
