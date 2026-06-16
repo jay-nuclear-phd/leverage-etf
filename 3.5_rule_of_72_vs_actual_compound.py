@@ -42,6 +42,9 @@ highlight_products = highlight_rates * highlight_actual_years
 # ==========================================
 # 3. 그래프 시각화
 # ==========================================
+import os
+os.makedirs('plots', exist_ok=True)
+
 fig, axes = plt.subplots(
     nrows=2,
     ncols=1,
@@ -82,10 +85,11 @@ for r, y in zip(highlight_rates, highlight_actual_years):
         fontsize=10
     )
 
-axes[0].set_title("연수익률에 따른 자산 2배 달성 기간", fontsize=16, pad=15)
-axes[0].set_ylabel("자산이 2배가 되는 기간 (년)", fontsize=12)
+axes[0].set_title("연수익률에 따른 자산 2배 달성 기간", fontsize=20, pad=20)
+axes[0].set_ylabel("자산이 2배가 되는 기간 (년)", fontsize=16, labelpad=15)
+axes[0].tick_params(axis='both', which='major', labelsize=12)
 axes[0].grid(True, alpha=0.3)
-axes[0].legend(fontsize=11)
+axes[0].legend(fontsize=12)
 axes[0].set_ylim(0, 75)
 
 # -------------------------
@@ -133,17 +137,19 @@ for i, (r, p, y) in enumerate(zip(highlight_rates, highlight_products, highlight
         va="bottom"
     )
 
-axes[1].set_title("실제 복리 계산에서 연수익률 × 기간", fontsize=16, pad=15)
-axes[1].set_xlabel("연수익률 (%)", fontsize=12)
-axes[1].set_ylabel("연수익률 × 기간", fontsize=12)
+axes[1].set_title("실제 복리 계산에서 연수익률 × 기간", fontsize=20, pad=20)
+axes[1].set_xlabel("연수익률 (%)", fontsize=16, labelpad=15)
+axes[1].set_ylabel("연수익률 × 기간", fontsize=16, labelpad=15)
+axes[1].tick_params(axis='both', which='major', labelsize=12)
 axes[1].grid(True, alpha=0.3)
-axes[1].legend(fontsize=11)
+axes[1].legend(fontsize=12)
 
 # ==========================================
 # 4. 전체 설정 및 마무리
 # ==========================================
 axes[1].set_xlim(0, 20)
 axes[1].set_xticks(np.arange(0, 21, 2))
+
 
 fig.text(
     0.5,
@@ -156,6 +162,6 @@ fig.text(
 plt.tight_layout(rect=[0, 0.04, 1, 0.95])
 
 # 고해상도 저장
-plt.savefig("rule_of_72_vs_actual_compound.png", dpi=300, bbox_inches="tight")
+plt.savefig("plots/3.5_rule_of_72_vs_actual_compound.png", dpi=300, bbox_inches="tight")
 
 plt.show()
