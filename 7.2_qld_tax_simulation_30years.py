@@ -115,87 +115,110 @@ money_cols = [
 import os
 os.makedirs('plots', exist_ok=True)
 
-fig, ax = plt.subplots(figsize=(10, 7))
+def plot_tax_simulation(lang='ko'):
+    if lang == 'ko':
+        title = "매년 매도 전략 vs 계속 보유 전략 세후 최종금액"
+        xlabel = "투자 기간 (년)"
+        ylabel = "세후 최종금액 (억 원)"
+        label_sell = "매년 매도 후 재매수"
+        label_hold = "계속 보유 후 최종 매도"
+        inset_title = "최초 10년 차이"
+        inset_xlabel = "투자 기간 (년)"
+        inset_ylabel = "차이 (만 원)"
+        inset_label = "매년 매도 - 계속 보유"
+        save_name = "plots/7.2_qld_tax_simulation_30years.png"
+    else:
+        title = "Sell Every Year vs. Hold and Sell: After-tax Final Amount"
+        xlabel = "Investment Period (Years)"
+        ylabel = "After-tax Final Amount (100M KRW)"
+        label_sell = "Sell and Rebuy Every Year"
+        label_hold = "Hold and Sell at the End"
+        inset_title = "Difference in First 10 Years"
+        inset_xlabel = "Investment Period (Years)"
+        inset_ylabel = "Difference (10k KRW)"
+        inset_label = "Sell Every Year - Hold and Sell"
+        save_name = "plots/7.2_qld_tax_simulation_30years_EN.png"
 
-# 원 그래프 데이터
-x = result_df["연도"]
-y_sell = result_df["매년 매도 전략_세후 최종금액"] / 100_000_000
-y_hold = result_df["계속 보유 전략_세후 최종금액"] / 100_000_000
+    fig, ax = plt.subplots(figsize=(10, 7))
 
-# 메인 그래프
-ax.plot(
-    x,
-    y_sell,
-    marker="o",
-    linewidth=1,
-    label="매년 매도 후 재매수"
-)
+    # 원 그래프 데이터
+    x = result_df["연도"]
+    y_sell = result_df["매년 매도 전략_세후 최종금액"] / 100_000_000
+    y_hold = result_df["계속 보유 전략_세후 최종금액"] / 100_000_000
 
-ax.plot(
-    x,
-    y_hold,
-    marker="s",
-    linewidth=1,
-    label="계속 보유 후 최종 매도"
-)
+    # 메인 그래프
+    ax.plot(
+        x,
+        y_sell,
+        marker="o",
+        linewidth=1,
+        label=label_sell
+    )
 
-ax.set_title("매년 매도 전략 vs 계속 보유 전략 세후 최종금액", fontsize=20, pad=20)
-ax.set_xlabel("투자 기간 (년)", fontsize=16, labelpad=15)
-ax.set_ylabel("세후 최종금액 (억 원)", fontsize=16, labelpad=15)
+    ax.plot(
+        x,
+        y_hold,
+        marker="s",
+        linewidth=1,
+        label=label_hold
+    )
 
-ax.grid(True, linestyle="--", alpha=0.4)
-ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.set_title(title, fontsize=20, pad=20)
+    ax.set_xlabel(xlabel, fontsize=16, labelpad=15)
+    ax.set_ylabel(ylabel, fontsize=16, labelpad=15)
 
-# 범례 오른쪽 아래
-ax.legend(loc="lower right", fontsize=12)
+    ax.grid(True, linestyle="--", alpha=0.4)
+    ax.tick_params(axis='both', which='major', labelsize=12)
 
-# ==========================================
-# 6. 보조 그래프: 최초 10년 차이
-# ==========================================
-inset_ax = ax.inset_axes([0.07, 0.50, 0.48, 0.42])
+    # 범례 오른쪽 아래
+    ax.legend(loc="lower right", fontsize=12)
 
-zoom_df = result_df[result_df["연도"] <= 10].copy()
+    # ==========================================
+    # 6. 보조 그래프: 최초 10년 차이
+    # ==========================================
+    inset_ax = ax.inset_axes([0.07, 0.50, 0.48, 0.42])
 
-# 차이: 매년 매도 전략 - 계속 보유 전략
-zoom_df["매년 매도 - 계속 보유"] = (
-    zoom_df["매년 매도 전략_세후 최종금액"]
-    - zoom_df["계속 보유 전략_세후 최종금액"]
-) / 10_000
+    zoom_df = result_df[result_df["연도"] <= 10].copy()
 
-inset_ax.plot(
-    zoom_df["연도"],
-    zoom_df["매년 매도 - 계속 보유"],
-    marker="o",
-    linewidth=1.8,
-    markersize=5,
-    color="crimson",
-    label="매년 매도 - 계속 보유"
-)
+    # 차이: 매년 매도 전략 - 계속 보유 전략
+    zoom_df["매년 매도 - 계속 보유"] = (
+        zoom_df["매년 매도 전략_세후 최종금액"]
+        - zoom_df["계속 보유 전략_세후 최종금액"]
+    ) / 10_000
 
-# 0 기준선
-inset_ax.axhline(
-    y=0,
-    linewidth=1,
-    linestyle="--",
-    color="black",
-    alpha=0.7
-)
+    inset_ax.plot(
+        zoom_df["연도"],
+        zoom_df["매년 매도 - 계속 보유"],
+        marker="o",
+        linewidth=1.8,
+        markersize=5,
+        color="crimson",
+        label=inset_label
+    )
 
-inset_ax.set_title("최초 10년 차이", fontsize=12)
-inset_ax.set_xlim(1, 10)
-inset_ax.set_xticks(range(1, 11, 1))
-inset_ax.set_xlabel("투자 기간 (년)", fontsize=12)
-inset_ax.set_ylabel("차이 (만 원)", fontsize=12)
+    # 0 기준선
+    inset_ax.axhline(
+        y=0,
+        linewidth=1,
+        linestyle="--",
+        color="black",
+        alpha=0.7
+    )
 
-inset_ax.grid(True, linestyle="--", alpha=0.35)
-inset_ax.tick_params(axis="both", labelsize=12)
+    inset_ax.set_title(inset_title, fontsize=12)
+    inset_ax.set_xlim(1, 10)
+    inset_ax.set_xticks(range(1, 11, 1))
+    inset_ax.set_xlabel(inset_xlabel, fontsize=12)
+    inset_ax.set_ylabel(inset_ylabel, fontsize=12)
 
-plt.tight_layout()
+    inset_ax.grid(True, linestyle="--", alpha=0.35)
+    inset_ax.tick_params(axis="both", labelsize=12)
 
-plt.savefig(
-    "plots/7.2_qld_tax_simulation_30years.png",
-    dpi=300,
-    bbox_inches="tight"
-)
+    plt.tight_layout()
 
-plt.show()
+    plt.savefig(save_name, dpi=300, bbox_inches="tight")
+    plt.show()
+
+# 두 버전 모두 생성
+plot_tax_simulation('ko')
+plot_tax_simulation('en')

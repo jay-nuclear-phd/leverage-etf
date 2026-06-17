@@ -118,126 +118,150 @@ best_lower_bound = plot_df.loc[best_lower_idx, "lower_bound"]
 import os
 os.makedirs('plots', exist_ok=True)
 
-plt.figure(figsize=(10, 7))
+def plot_leverage_distribution(lang='ko'):
+    if lang == 'ko':
+        xlabel = '레버리지 배율'
+        ylabel = '평균 연복리 수익률 (%)'
+        title = '레버리지 배율에 따른 연복리 수익률(CAGR) 분포\n(NASDAQ 100 1999-2024 가상 시뮬레이션)'
+        label_range = '평균 ± 표준편차 2배 범위'
+        label_mean = '평균 연복리 수익률'
+        label_peak_avg = '평균 수익률 최고점'
+        label_peak_lower = '하단 기준 최고점'
+        text_peak_avg = "평균 최고점\n{:.1f}배, {:.1f}%"
+        text_peak_lower = "하단 기준 최고점\n{:.1f}배\n하단 {:.1f}%"
+        save_name = "plots/5.3.1_leverage_cagr_errorbar.png"
+    else:
+        xlabel = 'Leverage Multiplier'
+        ylabel = 'Average CAGR (%)'
+        title = 'CAGR Distribution by Leverage Multiplier\n(Virtual Simulation of NASDAQ 100 1999-2024)'
+        label_range = 'Mean ± 2 Standard Deviations Range'
+        label_mean = 'Average CAGR'
+        label_peak_avg = 'Peak Average Return'
+        label_peak_lower = 'Lower Bound Peak'
+        text_peak_avg = "Peak Average\n{:.1f}x, {:.1f}%"
+        text_peak_lower = "Lower Bound Peak\n{:.1f}x\nLower {:.1f}%"
+        save_name = "plots/5.3.1_leverage_cagr_errorbar_EN.png"
 
-# 에러바 영역을 연한 음영으로 표시
-plt.fill_between(
-    x,
-    plot_df["lower_bound"],
-    plot_df["upper_bound"],
-    alpha=0.12,
-    label="평균 ± 표준편차 2배 범위"
-)
+    plt.figure(figsize=(10, 7))
 
-# 기본 에러바
-plt.errorbar(
-    x,
-    y,
-    yerr=yerr,
-    fmt="o-",
-    linewidth=2.4,
-    markersize=5.5,
-    elinewidth=1.6,
-    capsize=4,
-    capthick=1.4,
-    alpha=0.9,
-    label="평균 연복리 수익률"
-)
-
-# 평균 수익률 최고점 하이라이트
-plt.scatter(
-    max_return_x,
-    max_return_y,
-    s=150,
-    color="crimson",
-    edgecolor="black",
-    linewidth=1.0,
-    zorder=5,
-    label="평균 수익률 최고점"
-)
-
-plt.annotate(
-    f"평균 최고점\n{max_return_x:.1f}배, {max_return_y:.1f}%",
-    xy=(max_return_x, max_return_y),
-    xytext=(max_return_x - 0.45, max_return_y + 1.1),
-    fontsize=12,
-    arrowprops=dict(
-        arrowstyle="->",
-        linewidth=1.2,
-        color="crimson"
-    ),
-    bbox=dict(
-        facecolor="white",
-        edgecolor="crimson",
-        alpha=0.9,
-        boxstyle="round,pad=0.3"
+    # 에러바 영역을 연한 음영으로 표시
+    plt.fill_between(
+        x,
+        plot_df["lower_bound"],
+        plot_df["upper_bound"],
+        alpha=0.12,
+        label=label_range
     )
-)
 
-# 에러바 하단값 최고점 하이라이트
-plt.scatter(
-    best_lower_x,
-    best_lower_y,
-    s=150,
-    color="darkgreen",
-    edgecolor="black",
-    linewidth=1.0,
-    zorder=5,
-    label="하단 기준 최고점"
-)
-
-# 하단값 위치도 따로 표시
-plt.scatter(
-    best_lower_x,
-    best_lower_bound,
-    s=90,
-    color="darkgreen",
-    marker="v",
-    edgecolor="black",
-    linewidth=0.8,
-    zorder=5
-)
-
-plt.annotate(
-    f"하단 기준 최고점\n{best_lower_x:.1f}배\n하단 {best_lower_bound:.1f}%",
-    xy=(best_lower_x, best_lower_bound),
-    xytext=(best_lower_x + 0.18, best_lower_bound - 1.7),
-    fontsize=12,
-    arrowprops=dict(
-        arrowstyle="->",
-        linewidth=1.2,
-        color="darkgreen"
-    ),
-    bbox=dict(
-        facecolor="white",
-        edgecolor="darkgreen",
+    # 기본 에러바
+    plt.errorbar(
+        x,
+        y,
+        yerr=yerr,
+        fmt="o-",
+        linewidth=2.4,
+        markersize=5.5,
+        elinewidth=1.6,
+        capsize=4,
+        capthick=1.4,
         alpha=0.9,
-        boxstyle="round,pad=0.3"
+        label=label_mean
     )
-)
 
-# 기준선: 1배 수익률
-base_return = plot_df.loc[plot_df["leverage"] == 1.0, "mean_pct"].iloc[0]
+    # 평균 수익률 최고점 하이라이트
+    plt.scatter(
+        max_return_x,
+        max_return_y,
+        s=150,
+        color="crimson",
+        edgecolor="black",
+        linewidth=1.0,
+        zorder=5,
+        label=label_peak_avg
+    )
 
-# 그래프 설정
-plt.grid(True, linestyle="--", alpha=0.35)
+    plt.annotate(
+        text_peak_avg.format(max_return_x, max_return_y),
+        xy=(max_return_x, max_return_y),
+        xytext=(max_return_x - 0.45, max_return_y + 1.1),
+        fontsize=12,
+        arrowprops=dict(
+            arrowstyle="->",
+            linewidth=1.2,
+            color="crimson"
+        ),
+        bbox=dict(
+            facecolor="white",
+            edgecolor="crimson",
+            alpha=0.9,
+            boxstyle="round,pad=0.3"
+        )
+    )
 
-plt.xlabel("레버리지 배율", fontsize=16, labelpad=15)
-plt.ylabel("평균 연복리 수익률 (%)", fontsize=16, labelpad=15)
+    # 에러바 하단값 최고점 하이라이트
+    plt.scatter(
+        best_lower_x,
+        best_lower_y,
+        s=150,
+        color="darkgreen",
+        edgecolor="black",
+        linewidth=1.0,
+        zorder=5,
+        label=label_peak_lower
+    )
 
-plt.title(
-    "레버리지 배율별 평균 연복리 수익률과 변동성",
-    fontsize=20,
-    pad=20
-)
+    # 하단값 위치도 따로 표시
+    plt.scatter(
+        best_lower_x,
+        best_lower_bound,
+        s=90,
+        color="darkgreen",
+        marker="v",
+        edgecolor="black",
+        linewidth=0.8,
+        zorder=5
+    )
 
-plt.xticks(np.arange(1.0, 3.0 + 0.1, 0.1), rotation=45, fontsize=12)
-plt.yticks(fontsize=12)
+    plt.annotate(
+        text_peak_lower.format(best_lower_x, best_lower_bound),
+        xy=(best_lower_x, best_lower_bound),
+        xytext=(best_lower_x + 0.18, best_lower_bound - 1.7),
+        fontsize=12,
+        arrowprops=dict(
+            arrowstyle="->",
+            linewidth=1.2,
+            color="darkgreen"
+        ),
+        bbox=dict(
+            facecolor="white",
+            edgecolor="darkgreen",
+            alpha=0.9,
+            boxstyle="round,pad=0.3"
+        )
+    )
 
-plt.legend(fontsize=12, loc="upper left")
+    # 그래프 설정
+    plt.grid(True, linestyle="--", alpha=0.35)
 
-plt.tight_layout()
+    plt.xlabel(xlabel, fontsize=16, labelpad=15)
+    plt.ylabel(ylabel, fontsize=16, labelpad=15)
 
-plt.savefig("plots/5.3.1_leverage_cagr_errorbar.png", dpi=300, bbox_inches="tight")
+    plt.title(
+        title,
+        fontsize=20,
+        pad=20
+    )
 
-plt.show()
+    plt.xticks(np.arange(1.0, 3.0 + 0.1, 0.1), rotation=45, fontsize=12)
+    plt.yticks(fontsize=12)
+
+    plt.legend(fontsize=12, loc="upper left")
+
+    plt.tight_layout()
+
+    plt.savefig(save_name, dpi=300, bbox_inches="tight")
+    plt.show()
+
+# 두 버전 모두 생성
+plot_leverage_distribution('ko')
+plot_leverage_distribution('en')

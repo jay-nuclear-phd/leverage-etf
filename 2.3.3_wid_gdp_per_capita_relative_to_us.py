@@ -51,46 +51,81 @@ for country in countries:
 import os
 os.makedirs('plots', exist_ok=True)
 
-plt.figure(figsize=(10, 7))
-
-markers = ['s', 'o', '^', 'v', 'D', 'p', '*', 'h', 'x', '<', '>']
-colors = plt.cm.tab10(np.linspace(0, 1, len(countries)))
-ms = 8
-
-for i, country in enumerate(countries):
-    country_data = df_ratio[['Year', country]].dropna()
-
-    if country == '미국':
-        plt.plot(country_data['Year'], country_data[country],
-                 label=f'{country} (기준)',
-                 color='black',
-                 linewidth=3,
-                 linestyle='--', # 미국은 점선으로 표시
-                 zorder=10) # 가장 위로 올림
+def plot_relative_gdp(lang='ko'):
+    if lang == 'ko':
+        xlabel = '연도'
+        ylabel = '미국 대비 상대적 비율 (US = 1.0)'
+        title = '미국 1인당 GDP 대비 주요국 상대적 경제 수준 (1980-2024)'
+        suffix = '(기준)'
+        save_name = 'plots/2.3.3_wid_gdp_per_capita_relative_to_us.png'
     else:
-        plt.plot(country_data['Year'], country_data[country],
-                 marker=markers[i % len(markers)],
-                 markersize=ms,
-                 label=country,
-                 color=colors[i],
-                 linewidth=2,
-                 alpha=0.8)
+        xlabel = 'Year'
+        ylabel = 'Relative Ratio to US (US = 1.0)'
+        title = 'Relative Economic Level of Major Countries Compared to US Per Capita GDP (1980-2024)'
+        suffix = '(Base)'
+        save_name = 'plots/2.3.3_wid_gdp_per_capita_relative_to_us_EN.png'
 
-# 축 및 레이블 설정
-plt.xticks(range(1980, 2026, 5), fontsize=12)
-plt.yticks(fontsize=12)
-plt.xlabel('연도', fontsize=16, labelpad=15)
-plt.ylabel('미국 대비 상대적 비율 (US = 1.0)', fontsize=16, labelpad=15)
-plt.title('미국 1인당 GDP 대비 주요국 상대적 경제 수준 (1980-2024)', fontsize=20, pad=20)
+    country_mapping = {
+        '한국': 'Korea',
+        '미국': 'USA',
+        '중국': 'China',
+        '독일': 'Germany',
+        '일본': 'Japan',
+        '호주': 'Australia',
+        '캐나다': 'Canada',
+        '이탈리아': 'Italy',
+        '스웨덴': 'Sweden',
+        '프랑스': 'France'
+    }
 
-# 기준선(1.0) 강조
-plt.axhline(y=1.0, color='black', linestyle='-', linewidth=0.5, alpha=0.5)
+    plt.figure(figsize=(10, 7))
 
-# 범례 설정 (왼쪽 상단)
-plt.legend(loc='center left', fontsize=12, frameon=True, shadow=True, ncol=2)
+    markers = ['s', 'o', '^', 'v', 'D', 'p', '*', 'h', 'x', '<', '>']
+    colors = plt.cm.tab10(np.linspace(0, 1, len(countries)))
+    ms = 8
 
-plt.grid(True, axis='both', linestyle='--', alpha=0.4)
-plt.tight_layout()
+    for i, country in enumerate(countries):
+        label = country
+        if lang == 'en' and country in country_mapping:
+            label = country_mapping[country]
 
-plt.savefig('plots/2.3.3_wid_gdp_per_capita_relative_to_us.png', dpi=300, bbox_inches="tight")
-plt.show()
+        country_data = df_ratio[['Year', country]].dropna()
+
+        if country == '미국':
+            plt.plot(country_data['Year'], country_data[country],
+                     label=f'{label} {suffix}',
+                     color='black',
+                     linewidth=3,
+                     linestyle='--', # 미국은 점선으로 표시
+                     zorder=10) # 가장 위로 올림
+        else:
+            plt.plot(country_data['Year'], country_data[country],
+                     marker=markers[i % len(markers)],
+                     markersize=ms,
+                     label=label,
+                     color=colors[i],
+                     linewidth=2,
+                     alpha=0.8)
+
+    # 축 및 레이블 설정
+    plt.xticks(range(1980, 2026, 5), fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.xlabel(xlabel, fontsize=16, labelpad=15)
+    plt.ylabel(ylabel, fontsize=16, labelpad=15)
+    plt.title(title, fontsize=20, pad=20)
+
+    # 기준선(1.0) 강조
+    plt.axhline(y=1.0, color='black', linestyle='-', linewidth=0.5, alpha=0.5)
+
+    # 범례 설정 (왼쪽 상단)
+    plt.legend(loc='center left', fontsize=12, frameon=True, shadow=True, ncol=2)
+
+    plt.grid(True, axis='both', linestyle='--', alpha=0.4)
+    plt.tight_layout()
+
+    plt.savefig(save_name, dpi=300, bbox_inches="tight")
+    plt.show()
+
+# 두 버전 모두 생성
+plot_relative_gdp('ko')
+plot_relative_gdp('en')

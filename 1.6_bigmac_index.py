@@ -67,50 +67,73 @@ df['Norm_Count'] = min_max_scaler(df['BigMac_Count'])
 import os
 os.makedirs('plots', exist_ok=True)
 
-plt.figure(figsize=(10, 7))
-ms = 10
+def plot_bigmac(lang='ko'):
+    plt.figure(figsize=(10, 7))
+    ms = 10
 
-plt.plot(df['Year'], df['Norm_Invest'], marker='s', markersize=ms, label='예금 자산 (원)', color='blue')
-plt.plot(df['Year'], df['Norm_Price'], marker='o', markersize=ms, label='빅맥 가격 (원)', color='red')
-plt.plot(df['Year'], df['Norm_Count'], marker='^', markersize=ms, label='구매 가능 개수', color='green')
-
-plt.xticks(range(2006, 2027, 2), fontsize=12)
-plt.yticks([], fontsize=12)
-plt.xlabel('연도', fontsize=16, labelpad=15)
-plt.ylabel('정규화된 지수', fontsize=16, labelpad=15)
-plt.title('빅맥 지수 및 예금 자산 추이', fontsize=20, pad=20)
-
-# 상하 여백 설정
-plt.ylim(-0.1, 1.1)
-
-anno_font_size = 12
-# 실제 데이터 값 표기
-for i in range(len(df)):
-    plt.annotate(f"{df['Investment_Value'][i]/10000:.0f}만", (df['Year'][i], df['Norm_Invest'][i]),
-                 textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='blue')
-
-    # 특정 연도에 대한 BigMac_KRW 위치 조정
-    if df['Year'][i] in [2008, 2009, 2011, 2015, 2021, 2024]:
-        plt.annotate(f"{df['BigMac_KRW'][i]:.0f}", (df['Year'][i], df['Norm_Price'][i]),
-                     textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='red')
+    if lang == 'ko':
+        label_invest = '예금 자산 (원)'
+        label_price = '빅맥 가격 (원)'
+        label_count = '구매 가능 개수'
+        xlabel = '연도'
+        ylabel = '정규화된 지수'
+        title = '빅맥 지수 및 예금 자산 추이'
+        unit_man = '만'
+        save_name = "plots/1.6_bigmac_index.png"
     else:
-        plt.annotate(f"{df['BigMac_KRW'][i]:.0f}", (df['Year'][i], df['Norm_Price'][i]),
-                     textcoords="offset points", xytext=(0,-20), ha='center', fontsize=anno_font_size, color='red')
+        label_invest = 'Savings Asset (KRW)'
+        label_price = 'Big Mac Price (KRW)'
+        label_count = 'Purchasable Count'
+        xlabel = 'Year'
+        ylabel = 'Normalized Index'
+        title = 'Big Mac Index and Savings Asset Trends'
+        unit_man = '0k'
+        save_name = "plots/1.6_bigmac_index_EN.png"
 
-    # 특정 연도에 대한 BigMac_Count 위치 조정
-    if df['Year'][i] in [2008, 2015, 2018, 2019, 2021, 2022, 2024]:
-        plt.annotate(f"{df['BigMac_Count'][i]:.0f}", (df['Year'][i], df['Norm_Count'][i]),
-                     textcoords="offset points", xytext=(0,-20), ha='center', fontsize=anno_font_size, color='green')
-    else:
-        plt.annotate(f"{df['BigMac_Count'][i]:.0f}", (df['Year'][i], df['Norm_Count'][i]),
-                     textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='green')
+    plt.plot(df['Year'], df['Norm_Invest'], marker='s', markersize=ms, label=label_invest, color='blue')
+    plt.plot(df['Year'], df['Norm_Price'], marker='o', markersize=ms, label=label_price, color='red')
+    plt.plot(df['Year'], df['Norm_Count'], marker='^', markersize=ms, label=label_count, color='green')
 
-# 범례 상단 중앙 배치
-plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.), ncol=3, fontsize=12, frameon=True)
+    plt.xticks(range(2006, 2027, 2), fontsize=12)
+    plt.yticks([], fontsize=12)
+    plt.xlabel(xlabel, fontsize=16, labelpad=15)
+    plt.ylabel(ylabel, fontsize=16, labelpad=15)
+    plt.title(title, fontsize=20, pad=20)
 
-plt.grid(True, axis='x', linestyle='--')
-plt.tight_layout()
+    # 상하 여백 설정
+    plt.ylim(-0.1, 1.1)
 
-plt.savefig("plots/1.6_bigmac_index.png", dpi=300, bbox_inches="tight")
- 
-plt.show()
+    anno_font_size = 12
+    # 실제 데이터 값 표기
+    for i in range(len(df)):
+        plt.annotate(f"{df['Investment_Value'][i]/10000:.0f}{unit_man}", (df['Year'][i], df['Norm_Invest'][i]),
+                     textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='blue')
+
+        # 특정 연도에 대한 BigMac_KRW 위치 조정
+        if df['Year'][i] in [2008, 2009, 2011, 2015, 2021, 2024]:
+            plt.annotate(f"{df['BigMac_KRW'][i]:.0f}", (df['Year'][i], df['Norm_Price'][i]),
+                         textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='red')
+        else:
+            plt.annotate(f"{df['BigMac_KRW'][i]:.0f}", (df['Year'][i], df['Norm_Price'][i]),
+                         textcoords="offset points", xytext=(0,-20), ha='center', fontsize=anno_font_size, color='red')
+
+        # 특정 연도에 대한 BigMac_Count 위치 조정
+        if df['Year'][i] in [2008, 2015, 2018, 2019, 2021, 2022, 2024]:
+            plt.annotate(f"{df['BigMac_Count'][i]:.0f}", (df['Year'][i], df['Norm_Count'][i]),
+                         textcoords="offset points", xytext=(0,-20), ha='center', fontsize=anno_font_size, color='green')
+        else:
+            plt.annotate(f"{df['BigMac_Count'][i]:.0f}", (df['Year'][i], df['Norm_Count'][i]),
+                         textcoords="offset points", xytext=(0,15), ha='center', fontsize=anno_font_size, color='green')
+
+    # 범례 상단 중앙 배치
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.), ncol=3, fontsize=12, frameon=True)
+
+    plt.grid(True, axis='x', linestyle='--')
+    plt.tight_layout()
+
+    plt.savefig(save_name, dpi=300, bbox_inches="tight")
+    plt.show()
+
+# 두 버전 모두 생성
+plot_bigmac('ko')
+plot_bigmac('en')

@@ -134,29 +134,54 @@ print(simulation_results)
 import os
 os.makedirs('plots', exist_ok=True)
 
-plt.figure(figsize=(10, 7))
+def plot_holding_period_simulation(lang='ko'):
+    if lang == 'ko':
+        title = "보유 기간별 원금 손실 확률"
+        xlabel = "보유 기간 (년)"
+        ylabel = "원금 손실 확률 (%)"
+        product_labels = {
+            "가상 QQQ": "가상 QQQ",
+            "가상 QLD": "가상 QLD",
+            "가상 TQQQ": "가상 TQQQ"
+        }
+        save_name = "plots/5.4_simulate_qqq_qld_tqqq_holding_periods.png"
+    else:
+        title = "Probability of Principal Loss by Holding Period"
+        xlabel = "Holding Period (Years)"
+        ylabel = "Probability of Principal Loss (%)"
+        product_labels = {
+            "가상 QQQ": "Virtual QQQ",
+            "가상 QLD": "Virtual QLD",
+            "가상 TQQQ": "Virtual TQQQ"
+        }
+        save_name = "plots/5.4_simulate_qqq_qld_tqqq_holding_periods_EN.png"
 
-for product in products:
-    temp = simulation_results[simulation_results["투자 상품"] == product]
+    plt.figure(figsize=(10, 7))
 
-    plt.plot(
-        temp["보유 기간"],
-        temp["손실 확률(%)"],
-        marker="o",
-        linewidth=2.5,
-        label=product
-    )
+    for product in products:
+        temp = simulation_results[simulation_results["투자 상품"] == product]
 
-plt.title("보유 기간별 원금 손실 확률", fontsize=20, pad=20)
-plt.xlabel("보유 기간 (년)", fontsize=16, labelpad=15)
-plt.ylabel("원금 손실 확률 (%)", fontsize=16, labelpad=15)
+        plt.plot(
+            temp["보유 기간"],
+            temp["손실 확률(%)"],
+            marker="o",
+            linewidth=2.5,
+            label=product_labels[product]
+        )
 
-plt.xticks(range(1, 31, 1), fontsize=12)
-plt.yticks(fontsize=12)
-plt.grid(True, linestyle="--", alpha=0.4)
-plt.legend(fontsize=12)
+    plt.title(title, fontsize=20, pad=20)
+    plt.xlabel(xlabel, fontsize=16, labelpad=15)
+    plt.ylabel(ylabel, fontsize=16, labelpad=15)
 
-plt.tight_layout()
-plt.savefig("plots/5.4_simulate_qqq_qld_tqqq_holding_periods.png", dpi=300, bbox_inches="tight")
+    plt.xticks(range(1, 31, 1), fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(True, linestyle="--", alpha=0.4)
+    plt.legend(fontsize=12)
 
-plt.show()
+    plt.tight_layout()
+    plt.savefig(save_name, dpi=300, bbox_inches="tight")
+    plt.show()
+
+# 두 버전 모두 생성
+plot_holding_period_simulation('ko')
+plot_holding_period_simulation('en')
