@@ -176,7 +176,7 @@ def plot_tax_simulation(lang='ko'):
     # ==========================================
     # 6. 보조 그래프: 최초 10년 차이
     # ==========================================
-    inset_ax = ax.inset_axes([0.07, 0.50, 0.48, 0.42])
+    inset_ax = ax.inset_axes([0.10, 0.50, 0.48, 0.42])
 
     zoom_df = result_df[result_df["연도"] <= 10].copy()
 
