@@ -306,71 +306,6 @@
       line-height: 1.7;
     }
 
-    .hero-actions,
-    .hero-metrics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 30px;
-    }
-
-    .button {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      padding: 10px 16px;
-      background: var(--surface);
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 800;
-      line-height: 1.2;
-      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-    }
-
-    .button.primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    .button:hover {
-      transform: translateY(-1px);
-      border-color: var(--accent);
-    }
-
-    .hero-metrics {
-      gap: 12px 18px;
-      padding: 0;
-      margin-bottom: 0;
-      list-style: none;
-    }
-
-    .hero-metrics li {
-      display: grid;
-      gap: 2px;
-      padding-right: 18px;
-      border-right: 1px solid var(--line);
-    }
-
-    .hero-metrics li:last-child {
-      border-right: 0;
-    }
-
-    .metric-value {
-      font-weight: 900;
-      font-size: 1.08rem;
-      color: var(--text);
-    }
-
-    .metric-label {
-      color: var(--muted);
-      font-size: 0.86rem;
-    }
-
     .page {
       width: min(1180px, calc(100% - 32px));
       margin: 0 auto;
@@ -441,20 +376,6 @@
       display: grid;
       gap: 26px;
       min-width: 0;
-    }
-
-    .notice {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-left: 4px solid var(--gold);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .notice strong {
-      color: var(--text);
     }
 
     .article-shell {
@@ -723,11 +644,6 @@
         font-size: clamp(2.35rem, 13vw, 4rem);
       }
 
-      .hero-metrics li {
-        width: calc(50% - 9px);
-        border-right: 0;
-      }
-
       .toc-list {
         grid-template-columns: 1fr;
       }
@@ -790,13 +706,6 @@
         금융 문맹에서 시작해 시장 전체를 사고 오래 보유하는 투자 원칙까지.
         책의 본문과 데이터 그래프를 한 화면에서 읽기 좋게 정리했습니다.
       </p>
-      <div class="hero-actions" hidden>
-        <a class="button primary" id="startButton" href="#book">읽기 시작</a>
-      </div>
-      <ul class="hero-metrics" id="metricsSummary" aria-label="책 구성 요약" hidden>
-        <li><span class="metric-value" id="chapterCount">-</span><span class="metric-label" id="chapterLabel">장 구성</span></li>
-        <li><span class="metric-value" id="sectionCount">-</span><span class="metric-label" id="sectionLabel">소제목</span></li>
-      </ul>
     </div>
   </section>
 
@@ -807,10 +716,6 @@
     </aside>
 
     <div class="content">
-      <section class="notice" id="notice" aria-label="안내">
-        <strong id="noticeStrong">안내</strong> <span id="noticeText">이 페이지는 교육 목적의 개인 기록입니다. 투자 판단과 책임은 각자의 상황과 원칙에 따라 신중히 결정해야 합니다.</span>
-      </section>
-
       <section class="article-shell">
         <article class="article loading" id="book" aria-live="polite">본문을 불러오는 중입니다.</article>
       </section>
@@ -1491,14 +1396,7 @@
           kicker: "군인을 위한 장기 ETF 투자 노트",
           title: "핵박사 군인의 핵심 주식투자",
           lead: "금융 문맹에서 시작해 시장 전체를 사고 오래 보유하는 투자 원칙까지. 책의 본문과 데이터 그래프를 한 화면에서 읽기 좋게 정리했습니다.",
-          start: "읽기 시작",
-          metricsLabel: "책 구성 요약",
-          chapterLabel: "장 구성",
-          sectionLabel: "소제목",
           tocTitle: "목차",
-          noticeLabel: "안내",
-          noticeStrong: "안내",
-          noticeText: "이 페이지는 교육 목적의 개인 기록입니다. 투자 판단과 책임은 각자의 상황과 원칙에 따라 신중히 결정해야 합니다.",
           loading: "본문을 불러오는 중입니다.",
           errorTitle: "본문을 불러오지 못했습니다.",
           languageLabel: "언어 선택",
@@ -1537,14 +1435,7 @@
           kicker: "A Long-Term Leveraged ETF Investing Note",
           title: "Nuclear Ph.D's Core Leveraged ETF",
           lead: "From financial illiteracy to the principle of buying the whole market and holding for the long term, this page organizes the book text and data charts for comfortable reading.",
-          start: "Start Reading",
-          metricsLabel: "Book structure summary",
-          chapterLabel: "Chapters",
-          sectionLabel: "Sections",
           tocTitle: "Contents",
-          noticeLabel: "Notice",
-          noticeStrong: "Notice",
-          noticeText: "This page is a personal educational record. Investment decisions and responsibility should be considered carefully according to your own circumstances and principles.",
           loading: "Loading the text.",
           errorTitle: "Could not load the text.",
           languageLabel: "Language",
@@ -1602,16 +1493,7 @@
       heroKicker: document.getElementById("heroKicker"),
       heroTitle: document.getElementById("heroTitle"),
       heroLead: document.getElementById("heroLead"),
-      startButton: document.getElementById("startButton"),
-      metricsSummary: document.getElementById("metricsSummary"),
-      chapterCount: document.getElementById("chapterCount"),
-      sectionCount: document.getElementById("sectionCount"),
-      chapterLabel: document.getElementById("chapterLabel"),
-      sectionLabel: document.getElementById("sectionLabel"),
-      tocTitle: document.getElementById("tocTitle"),
-      notice: document.getElementById("notice"),
-      noticeStrong: document.getElementById("noticeStrong"),
-      noticeText: document.getElementById("noticeText")
+      tocTitle: document.getElementById("tocTitle")
     };
 
     function escapeHtml(value) {
@@ -1760,12 +1642,6 @@
       toc.innerHTML = useful.map((heading) => {
         return `<a class="level-${heading.level}" href="#${heading.id}" data-target="${heading.id}">${escapeHtml(heading.text)}</a>`;
       }).join("");
-    }
-
-    function updateMetrics(headings) {
-      const format = (value) => currentLanguage === "ko" ? `${value}개` : String(value);
-      ui.chapterCount.textContent = format(headings.filter((heading) => heading.level === 1).length);
-      ui.sectionCount.textContent = format(headings.filter((heading) => heading.level === 2).length);
     }
 
     function initScrollSpy() {
@@ -1924,15 +1800,8 @@
       ui.heroKicker.textContent = copy.kicker;
       ui.heroTitle.textContent = copy.title;
       ui.heroLead.textContent = copy.lead;
-      ui.startButton.textContent = copy.start;
-      ui.metricsSummary.setAttribute("aria-label", copy.metricsLabel);
-      ui.chapterLabel.textContent = copy.chapterLabel;
-      ui.sectionLabel.textContent = copy.sectionLabel;
       ui.tocPanel.setAttribute("aria-label", copy.tocTitle);
       ui.tocTitle.textContent = copy.tocTitle;
-      ui.notice.setAttribute("aria-label", copy.noticeLabel);
-      ui.noticeStrong.textContent = copy.noticeStrong;
-      ui.noticeText.textContent = copy.noticeText;
       updateLanguageButtons();
       updateTocToggleLabel();
     }
@@ -1964,7 +1833,6 @@
       article.setAttribute("lang", BOOKS[currentLanguage].htmlLang);
       article.innerHTML = rendered.html;
       renderToc(rendered.headings);
-      updateMetrics(rendered.headings);
       initScrollSpy();
       if (typeof requestAnimationFrame === "function") {
         requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
